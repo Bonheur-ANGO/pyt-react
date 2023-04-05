@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import { Tweet } from './components/Tweet'
+import { TweetForm } from './components/TweetForm'
 
 function App() {
 
@@ -25,37 +26,41 @@ function App() {
     }
   ]
 
-
-
   let [tweets, setTweets] = useState(default_Tweets)
 
   const onDelete = (tweetId) => {
       setTweets((curr) => curr.filter((tweet) => tweet.id !== tweetId))
   }
 
-  const handleSubmit = (e) => {
-    event.preventDefault()
-    let user = e.target.name.value
-    let content = e.target.content.value
+  const onLike = (tweetId) => {
+    setTweets((curr) => {
+      const copyTweet = [...curr]
+
+      const likedTweet = copyTweet.find(tweet => tweet.id === tweetId)
+      likedTweet.like +=1
+
+      return copyTweet
+    })
+}
+
+  const handleSubmit = (tweet) => {
 
     const newTweet = {
-      id: tweets.length,
-      user,
-      content,
+      id: tweets.length+1,
+      name : tweet.name,
+      content : tweet.content,
       like : 0
     }
+    addTweet(newTweet)
+  }
 
-    setTweets([...tweets, newTweet])
+  const addTweet = (tweet) =>{
+    setTweets([...tweets, tweet])
   }
 
   return (
     <div>
-      <form action="" className='tweet-form' onSubmit={handleSubmit}>
-        <h4>New Tweet</h4>
-        <input type="text" name="name" id="" placeholder='Votre nom'/>
-        <textarea name="content" id="" cols="30" rows="10" placeholder='Votre Tweet'></textarea>
-        <input type="submit" value="Ajouter un tweet" />
-      </form>
+      <TweetForm onSubmit={handleSubmit} />
       <div className="tweet-container">
         {tweets.map((tweet) =>{
           return <Tweet 
@@ -66,6 +71,10 @@ function App() {
           like={tweet.like}
           onDelete={ (id) =>{
             onDelete(id)
+          }}
+
+          onLike={ (id) =>{
+            onLike(id)
           }}
           />
         })}
